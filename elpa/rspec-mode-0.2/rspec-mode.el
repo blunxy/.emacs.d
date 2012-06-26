@@ -35,7 +35,7 @@
 ;;    `\C-c ,t`)
 ;;
 ;;  * verify the spec file associated with the current buffer (bound to `\C-c ,v`)
-;;  
+;;
 ;;  * verify the spec defined in the current buffer if it is a spec
 ;;    file (bound to `\C-c ,v`)
 ;;
@@ -57,7 +57,7 @@
 ;;
 ;; This minor mode depends on `mode-compile`.  The expectations depend
 ;; `on el-expectataions.el`.
-;; 
+;;
 
 ;;; Change Log:
 ;; 0.2 - Tim Harper implemented support for imenu to generate a basic
@@ -113,7 +113,7 @@
   "Moves point to the beginning of the example in which the point current is."
   (interactive)
   (let ((start (point)))
-    (goto-char 
+    (goto-char
      (save-excursion
        (end-of-line)
        (unless (and (search-backward-regexp "^[[:space:]]*it[[:space:]]*(?[\"']" nil t)
@@ -139,7 +139,7 @@
 (defun rspec-disable-example ()
   "Disable the example in which the point is located"
   (interactive)
-  (when (not (rspec-example-pending-p))   
+  (when (not (rspec-example-pending-p))
     (save-excursion
       (rspec-beginning-of-example)
       (end-of-line)
@@ -154,19 +154,20 @@
       (rspec-beginning-of-example)
       (search-forward-regexp "^[[:space:]]*pending\\([[:space:](]\\|$\\)" (save-excursion (ruby-end-of-block) (point)))
       (beginning-of-line)
-      (delete-region (save-excursion (beginning-of-line) (point)) 
+      (delete-region (save-excursion (beginning-of-line) (point))
                      (save-excursion (forward-line 1) (point))))))
-  
+
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) "--format specdoc" "--reverse"))
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name))))
+;;  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) "--format specdoc" "--reverse"))
 
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) "--format specdoc" "--reverse" (concat "--line " (number-to-string (line-number-at-pos)))))
- 
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (concat "--line " (number-to-string (line-number-at-pos)))))
+
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
@@ -187,13 +188,13 @@
   "Find spec for the specified file"
   (if (rspec-spec-file-p a-file-name)
       a-file-name
-    (rspec-specize-file-name (expand-file-name (replace-regexp-in-string "^\\.\\./[^/]+/" "" (file-relative-name a-file-name (rspec-spec-directory a-file-name))) 
+    (rspec-specize-file-name (expand-file-name (replace-regexp-in-string "^\\.\\./[^/]+/" "" (file-relative-name a-file-name (rspec-spec-directory a-file-name)))
                                                (rspec-spec-directory a-file-name)))))
 
 (defun rspec-target-file-for (a-spec-file-name)
   "Find the target for a-spec-file-name"
-  (first 
-   (file-expand-wildcards 
+  (first
+   (file-expand-wildcards
     (replace-regexp-in-string "/spec/" "/*/" (rspec-targetize-file-name a-spec-file-name)))))
 
 (defun rspec-specize-file-name (a-file-name)
@@ -205,19 +206,19 @@
 (defun rspec-targetize-file-name (a-file-name)
   "Returns a-file-name but converted into a non-spec file name"
      (concat (file-name-directory a-file-name)
-             (rspec-file-name-with-default-extension 
+             (rspec-file-name-with-default-extension
               (replace-regexp-in-string "_spec\\.rb" "" (file-name-nondirectory a-file-name)))))
-  
+
 (defun rspec-file-name-with-default-extension (a-file-name)
   "Adds .rb file extension to a-file-name if it does not already have an extension"
   (if (file-name-extension a-file-name)
       a-file-name ;; file has a extension already so do nothing
     (concat a-file-name ".rb")))
-        
+
 (defun rspec-directory-subdirectories (directory)
   "Returns list of subdirectories"
-  (remove-if 
-   (lambda (dir) (or (string-match "^\\.\\.?$" (file-name-nondirectory dir)) 
+  (remove-if
+   (lambda (dir) (or (string-match "^\\.\\.?$" (file-name-nondirectory dir))
                      (not (file-directory-p dir))))
    (directory-files directory t)))
 
@@ -228,7 +229,7 @@
 (defun rspec-root-directory-p (a-directory)
   "Returns t if a-directory is the root"
   (equal a-directory (rspec-parent-directory a-directory)))
-   
+
 (defun rspec-spec-directory (a-file)
   "Returns the nearest spec directory that could contain specs for a-file"
   (if (file-directory-p a-file)
@@ -251,11 +252,11 @@
 
 (defun rspec-example-name-at-point ()
   "Returns the name of the example in which the point is currently positioned; or nil if it is outside of and example"
-  (save-excursion 
+  (save-excursion
     (rspec-beginning-of-example)
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
-                    
+
 (defun rspec-register-verify-redo (redoer)
   "Register a bit of code that will repeat a verification process"
   (let ((redoer-cmd (eval (append '(lambda () (interactive)) (list redoer)))))
@@ -264,14 +265,18 @@
 (defun rspec-run (&rest opts)
   "Runs spec with the specified options"
   (rspec-register-verify-redo (cons 'rspec-run opts))
-  (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
+  (compile (concat "rspec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
   (end-of-buffer-other-window 0))
+
+;;  (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec with the specified options"
   (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
-  (compile (concat "rake spec SPEC=\'" spec-file "\' SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
+  (compile (concat "bundle exec rspec --drb --color " spec-file) t)
   (end-of-buffer-other-window 0))
+
+;;  (compile (concat "rake spec SPEC=\'" spec-file "\' SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."

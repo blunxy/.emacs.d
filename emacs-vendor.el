@@ -1,6 +1,8 @@
 ;; emacs-vedor.el - general purpose modes to extend emacs
 (load-lib-dir "vendor")
 
+(require 'magit)
+
 ;; Interactively Do Things (ido) emacs is more fun with ido fo real
 (require 'ido)
 (ido-mode t)
@@ -20,10 +22,10 @@
 (global-set-key (kbd "M-F") 'ack)
 (global-set-key (kbd "C-x g") 'magit-status)
 
-(eval-after-load 'magit
-  '(progn
-     (set-face-foreground 'magit-diff-add "green3")
-     (set-face-foreground 'magit-diff-del "red3")))
+;;(eval-after-load 'magit
+;;  '(progn
+;;     (set-face-foreground 'magit-diff-add "green3")
+;;     (set-face-foreground 'magit-diff-del "red3")))
 
 ;; Textile
 (require 'textile-mode)
@@ -53,3 +55,5 @@
  (autoload 'scss-mode "scss-mode")
  (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 
+(require 'rvm)
+(rvm-use-default)

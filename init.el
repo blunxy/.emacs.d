@@ -36,13 +36,18 @@
 
 (set-frame-size-according-to-resolution)
 
+
+;; Couldn't get bundle exec to be recognized from within comint without the following
+(if (not (getenv "TERM_PROGRAM"))
+       (setenv "PATH"
+               (shell-command-to-string "source $HOME/.bashrc && printf $PATH")))
+
 (setenv "PATH"
         (concat
          "/Users/jordan/.rvm/gems/ruby-1.9.2-p290/gems/sass-3.1.12/bin" ":"
          (getenv "PATH");
 )
 )
-
 
 (setq mac-option-modifier 'super)
 (setq mac-command-modifier 'meta)
